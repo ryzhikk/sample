@@ -1,0 +1,64 @@
+{% extends 'default/personal/base.html.twig' %}
+
+{% block centerBlock %}
+
+    <p class="shopCartInsOrdersRightTitle">Оформить заявку на вывод средств</p>
+
+    {% if list|length == 0 %}
+        У Вас нет ни одной заявки.
+    {% else %}
+        <table>
+            <tbody>
+            <tr>
+                <td>Баланс</td>
+                <td>Дата создания</td>
+                <td>Сумма</td>
+                <td>Метод вывода</td>
+                <td>Номер счёта</td>
+                <td>Статус</td>
+            </tr>
+            {% for request in list %}
+                <tr>
+                    <td>{{ ('withdrawRequestType.' ~ request.type) | trans([], 'types') }}</td>
+                    <td>{{ request.dateCreate | date('d.m.Y h:i') }}</td>
+                    <td>{{ request.sum }}</td>
+                    <td>{{ request.method | trans }}</td>
+                    <td>
+                        {{ request.account }}
+                        {% if request.bic and request.fullName %}
+                            <br>
+                            {{ request.fullName }}
+                            <br>
+                            БИК: {{ request.bic }}
+                        {% endif %}
+                    </td>
+                    <td>{{ request.status|trans }}</td>
+                    <td style="text-align: left">
+                        {%  if request.status == 'new' %}
+                            <a class="confirmable" title="Отменить заявку" href="{{ path('billing_withdraw_delete', {requestId: request.id}) }}" style="color: red; text-decoration: none;">X</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-bottom: 30px;" colspan="6">
+                        {{ request.comment|default('') }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(function() {
+            $('a.confirmable').click(function() {
+                return confirm('Отменить заявку?');
+            });
+        });
+    </script>
+{% endblock %}

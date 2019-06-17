@@ -1,0 +1,51 @@
+{% extends 'default/personal/base.html.twig' %}
+
+{% block centerBlock %}
+
+    <p class="shopCartTitle">{{ article.name }}</p>
+
+    <div class="article">{{ article.content | raw }}</div>
+    <div class="b-form__section top-20">
+        <form class="j-promocode-form" method="post" action="{{ path('personal_promocode_activation') }}">
+            <div class="b-error-info j-error"></div>
+            <input style="width: 200px" type="text" name="code"
+                   class="b-form-inp fieldset" placeholder="Промокод" autofocus required>
+
+            <button type="submit" class="b-btn b-color-yellow left-10">Активировать</button>
+        </form>
+        <p class="j-notification-success top-10"></p>
+        <p class="j-notification-error error"></p>
+    </div>
+
+    <div class="top-20"></div>
+
+    <p class="shopCartTitle">Активированные промокоды</p>
+
+    <table>
+        <tbody>
+        <tr>
+            <td>Промокод</td>
+            <td>Дата начала действия</td>
+            <td>Дата окончания действия</td>
+            <td>Получено кешбэка</td>
+            <td>Описание</td>
+        </tr>
+        <tr>
+            <td class="j-new-promocode-code"></td>
+            <td class="j-new-promocode-created-at"></td>
+            <td class="j-new-promocode-finished-at"></td>
+            <td class="j-new-promocode-amount"></td>
+            <td class="j-new-promocode-desc"></td>
+        </tr>
+        {% for bonus in promocodeBonuses %}
+            <tr {% if bonus.isFinished %} class="inactive" {% endif %}>
+                <td><b>{{ (bonus.promocode.code == affiliatePromocodeName) ? service_code_generator.getAffiliateCodeByUserId(app.user.referrer.id) : bonus.promocode.code }}</b></td>
+                <td>{{ bonus.startedAt | date('d.m.Y') }}</td>
+                <td>{{ bonus.finishedAt | date('d.m.Y') }}</td>
+                <td><b>{{ bonus.amount | round(2) }}руб.</b></td>
+                <td>{{ bonus.promocode.description }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
